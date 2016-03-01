@@ -42,7 +42,6 @@ import android.widget.Toast;
  * 创建作者：majun<br/>
  * 联系作者:<a href="mailto:747673016@qq.com">@author majun</a><br/>
  * ======================================================<br/>
- * 版权声明：Copyright 2011 绿石开门 保留所有权利。<br/>
  * ======================================================<br/>
  */
 public class Tools {
