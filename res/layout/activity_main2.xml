@@ -1,0 +1,23 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.tmac.luck.MainActivity" >
+
+    <AutoCompleteTextView
+        android:id="@+id/et_alipay_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/border_light"
+        android:ellipsize="end"
+        android:hint="请输入支付宝账号"
+        android:padding="5dp"
+        android:singleLine="true"
+        android:textColor="#459889"
+        android:textColorHint="#00459889" />
+
+</RelativeLayout>

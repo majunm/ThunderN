@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 项目名称MyJoke,可用全局替换为当前项目名称 为什么会有\x3Cdir\x3E这个东西，其实就是<dir>，不过ant build.xml中不允许使用'<'字符，所以要转义一下-->
+<project name="ThunderN" default="deploy">
+
+
+	<property file="local.properties" />
+
+
+
+	<property file="ant.properties" />
+
+
+
+	<loadproperties srcFile="project.properties" />
+
+	<property name="aapt.ignore.assets" value="!.svn:!.git:\x3Cdir\x3E_*:.*:!CVS:!thumbs.db:!picasa.ini:!*.scc:*~:crunch" />
+	<fail message="sdk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through an env var" unless="sdk.dir" />
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+		    <!-- 自己本机路径为准 -->
+			<pathelement location="D:/JULY/ant/lib/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+
+	<import file="${sdk.dir}/tools/ant/build.xml" />
+
+	<target name="deploy">
+
+		<foreach delimiter="," list="${market_channels}" param="channel" target="modify_manifest">
+		</foreach>
+	</target>
+
+	<target name="modify_manifest">
+
+		<replaceregexp flags="g" byline="false" encoding="utf-8">
+			<regexp pattern="android:name=&quot;UMENG_CHANNEL&quot; android:value=&quot;(.*)&quot;" />
+			<substitution expression="android:name=&quot;UMENG_CHANNEL&quot; android:value=&quot;${channel}&quot;" />
+			<fileset dir="" includes="AndroidManifest.xml" />
+		</replaceregexp>
+		<antcall target="release" />
+		<echo message="========BEGIN================" />
+		<copy tofile="${gos.path}/${ant.project.name}_${app_version}_${channel}.apk">
+
+			<fileset dir="${out.absolute.dir}/" includes="${ant.project.name}-release.apk" />
+		</copy>
+		<!-- 删除临时的目录 -->
+		<delete includeEmptyDirs="true">
+			<fileset dir="${out.absolute.dir}" includes="**/*.d" />
+		</delete>
+		<delete includeEmptyDirs="true">
+			<fileset dir="${out.absolute.dir}" includes="**/*.prop" />
+		</delete>
+		<delete includeEmptyDirs="true">
+			<fileset dir="${out.absolute.dir}" includes="**/*.txt" />
+		</delete>
+		<delete includeEmptyDirs="true">
+			<fileset dir="${out.absolute.dir}" includes="**/*.ap_" />
+		</delete>
+		<delete includeEmptyDirs="true">
+			<fileset dir="${out.absolute.dir}" includes="**/*.dex" />
+		</delete>
+		<deltree dir="${out.absolute.dir}/proguard" />
+
+		<echo message="========SUCCESSFULLY================" />
+		<echo message="========SUCCESSFULLY================================" />
+		<echo message="========SUCCESSFULLY================" />
+	</target>
+
+</project>
