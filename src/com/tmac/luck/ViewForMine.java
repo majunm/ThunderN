@@ -179,7 +179,7 @@ public class ViewForMine extends View {
 		System.out.println();
 		System.out.println("========================================");
 		// 打印地雷图
-		Log.e("DEBUG", "init....................");
+		// Log.e("DEBUG", "init....................");
 	}
 
 	@Override
