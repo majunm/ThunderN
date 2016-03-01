@@ -30,12 +30,12 @@ import android.widget.TextView;
 
 import com.curry.curry;
 import com.tmac.R;
-import com.tmac.luck.ViewForMine.CallBack;
+import com.tmac.luck.ThunderView.CallBack;
 import com.umeng.analytics.MobclickAgent;
 
 public class MainActivity extends Activity implements CallBack {
 	Context ctx;
-	private ViewForMine mineView;
+	private ThunderView mineView;
 	private View view;
 	private TextView timeTv;
 
@@ -107,7 +107,7 @@ public class MainActivity extends Activity implements CallBack {
 			Log.e("JULY", "sb:" + sb);
 		} catch (Exception e) {
 		}
-		mineView = (ViewForMine) findViewById(R.id.mine);
+		mineView = (ThunderView) findViewById(R.id.mine);
 		mineView.call = this;
 		timeTv = (TextView) findViewById(R.id.time);
 		mineTip = (TextView) findViewById(R.id.mine_tip);

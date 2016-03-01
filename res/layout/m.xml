@@ -26,7 +26,7 @@
             android:padding="8dp"
             android:textColor="#118EFA" />
 
-        <com.tmac.luck.ViewForMine
+        <com.tmac.luck.ThunderView
             android:id="@+id/mine"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
