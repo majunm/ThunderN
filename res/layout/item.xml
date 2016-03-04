@@ -2,11 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="3dp"
-    android:layout_marginRight="3dp"
-    android:layout_marginTop="8dp"
     android:layout_marginBottom="3dp"
-    android:background="@drawable/border_light"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    android:layout_marginTop="8dp"
     android:orientation="horizontal" >
 
     <com.tmac.luck.DrawableCenterTv
@@ -14,20 +13,23 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="@drawable/border_light"
+        android:drawableLeft="@drawable/time"
+        android:drawablePadding="8dp"
         android:gravity="center_vertical"
         android:padding="8dp"
-        android:drawableLeft="@drawable/time"
+        android:layout_marginRight="3dp"
         android:text="耗时0秒"
-        android:drawablePadding="8dp"
         android:textColor="#00FF00" />
 
     <com.tmac.luck.DrawableCenterTv
         android:id="@+id/mine_tip"
         android:layout_width="0dp"
-        android:drawablePadding="8dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="@drawable/border_light"
         android:drawableLeft="@drawable/mine_"
+        android:drawablePadding="8dp"
         android:gravity="center_vertical"
         android:padding="8dp"
         android:textColor="#00FF00" />

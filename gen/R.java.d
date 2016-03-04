@@ -1,5 +1,6 @@
 D:\JULY\Thunder\gen\com\tmac\R.java \
  : D:\JULY\Thunder\res\drawable\border_light.xml \
+D:\JULY\Thunder\res\drawable\pop.xml \
 D:\JULY\Thunder\res\drawable-hdpi\flag_red.png \
 D:\JULY\Thunder\res\drawable-hdpi\flag_red_.png \
 D:\JULY\Thunder\res\drawable-hdpi\ic_launcher.png \
@@ -22,8 +23,10 @@ D:\JULY\Thunder\res\layout\item.xml \
 D:\JULY\Thunder\res\layout\learning.xml \
 D:\JULY\Thunder\res\layout\m.xml \
 D:\JULY\Thunder\res\layout\main.xml \
+D:\JULY\Thunder\res\layout\pop_layout.xml \
 D:\JULY\Thunder\res\layout\title.xml \
 D:\JULY\Thunder\res\menu\main.xml \
+D:\JULY\Thunder\res\values\colors.xml \
 D:\JULY\Thunder\res\values\dimens.xml \
 D:\JULY\Thunder\res\values\strings.xml \
 D:\JULY\Thunder\res\values\styles.xml \

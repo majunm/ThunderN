@@ -17,19 +17,68 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_marginTop="3dp"
             android:background="@drawable/border_light"
-            android:gravity="center_vertical"
             android:drawablePadding="8dp"
+            android:gravity="center_vertical"
             android:padding="8dp"
             android:textColor="#118EFA" />
 
         <com.tmac.luck.ThunderView
             android:id="@+id/mine"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="0dp"
+            android:layout_weight="2" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal" >
+
+            <com.tmac.luck.DrawableCenterTv
+                android:id="@+id/pause"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/border_light"
+                android:drawablePadding="8dp"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="暂停"
+                android:textColor="#450945" />
+
+            <com.tmac.luck.DrawableCenterTv
+                android:id="@+id/fix"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/border_light"
+                android:drawablePadding="8dp"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="地图校正"
+                android:textColor="#450945" />
+
+            <com.tmac.luck.DrawableCenterTv
+                android:id="@+id/selcmine"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/border_light"
+                android:drawablePadding="8dp"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="选雷"
+                android:textColor="#450945" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -37,8 +86,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#ff0000"
-        android:orientation="horizontal"
-        >
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="恭喜发财"
+            android:textColor="#FFFFFF"
+            android:textSize="25dp" />
     </LinearLayout>
 
 </FrameLayout>

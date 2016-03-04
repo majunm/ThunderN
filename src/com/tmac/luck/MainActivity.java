@@ -1,5 +1,8 @@
 package com.tmac.luck;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -26,6 +29,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 
 import com.curry.curry;
@@ -33,11 +38,14 @@ import com.tmac.R;
 import com.tmac.luck.ThunderView.CallBack;
 import com.umeng.analytics.MobclickAgent;
 
-public class MainActivity extends Activity implements CallBack {
+public class MainActivity extends Activity implements CallBack,
+		android.view.View.OnClickListener {
 	Context ctx;
 	private ThunderView mineView;
 	private View view;
 	private TextView timeTv;
+	boolean isLock = true;
+	boolean isPauseing = false;
 
 	public void performAnimation() {
 		try {
@@ -49,6 +57,7 @@ public class MainActivity extends Activity implements CallBack {
 				@Override
 				public void onAnimationEnd(Animator animation) {
 					super.onAnimationEnd(animation);
+					isLock = false;
 					container.setVisibility(View.GONE);
 					mHandler.sendEmptyMessageDelayed(0, 1000);
 				}
@@ -112,18 +121,24 @@ public class MainActivity extends Activity implements CallBack {
 		timeTv = (TextView) findViewById(R.id.time);
 		mineTip = (TextView) findViewById(R.id.mine_tip);
 		bestScoreTv = (TextView) findViewById(R.id.best_score);
+		selcMineTv = (TextView) findViewById(R.id.selcmine);
+		pauseTv = (TextView) findViewById(R.id.pause);
+		findViewById(R.id.fix).setOnClickListener(this);
+		selcMineTv.setOnClickListener(this);
+		pauseTv.setOnClickListener(this);
 		drawable = getResources().getDrawable(R.drawable.best);
 		container = (ViewGroup) findViewById(R.id.splashcontainer);
-		drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+		drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+				drawable.getMinimumHeight());
 		int previousValue = shpf.getInt("LATEST_TOP", -1);
 		if (previousValue == -1) {
 			bestScoreTv.setText("您还没有最好成绩!加油!!!");
 			bestScoreTv.setGravity(Gravity.CENTER);
-			bestScoreTv.setCompoundDrawables(null,null,null,null);
+			bestScoreTv.setCompoundDrawables(null, null, null, null);
 		} else {
 			bestScoreTv.setText("您的最好成绩" + previousValue + "秒!");
 			bestScoreTv.setGravity(Gravity.CENTER_VERTICAL);
-			bestScoreTv.setCompoundDrawables(drawable,null,null,null);
+			bestScoreTv.setCompoundDrawables(drawable, null, null, null);
 		}
 		performAnimation();
 	}
@@ -167,8 +182,10 @@ public class MainActivity extends Activity implements CallBack {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		mHandler.removeMessages(0);
-		mHandler.sendEmptyMessageDelayed(0, 1000);
+		if (!isLock && !isPauseing) {
+			mHandler.removeMessages(0);
+			mHandler.sendEmptyMessageDelayed(0, 1000);
+		}
 		MobclickAgent.onResume(this);
 	}
 
@@ -193,25 +210,26 @@ public class MainActivity extends Activity implements CallBack {
 					+ "秒");
 			bestScoreTv.setText("您的最好成绩" + previousValue + "秒!");
 			bestScoreTv.setGravity(Gravity.CENTER_VERTICAL);
-			bestScoreTv.setCompoundDrawables(drawable,null,null,null);
+			bestScoreTv.setCompoundDrawables(drawable, null, null, null);
 		} else {
 			shpf.edit().putInt("LATEST_TOP", recLen).commit();
 			title.setText("恭喜您赢了耗时" + recLen + "秒");
-			if(previousValue==-1){
+			if (previousValue == -1) {
 				bestScoreTv.setText("您的最好成绩" + recLen + "秒!");
 				bestScoreTv.setGravity(Gravity.CENTER_VERTICAL);
-				bestScoreTv.setCompoundDrawables(drawable,null,null,null);
+				bestScoreTv.setCompoundDrawables(drawable, null, null, null);
 			}
 		}
 		mHandler.removeMessages(0);
 		recLen = 0;
 		final AlertDialog alert = new AlertDialog.Builder(this,
-				AlertDialog.THEME_DEVICE_DEFAULT_DARK).setView(view)
+				AlertDialog.THEME_DEVICE_DEFAULT_DARK).setCustomTitle(view)
 				.setNegativeButton("退出", new OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						dialog.dismiss();
+						mineView.isWin = false;
 						mineView.replay();
 						if (lock) {
 							finish();
@@ -228,6 +246,7 @@ public class MainActivity extends Activity implements CallBack {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						dialog.dismiss();
+						mineView.isWin = false;
 						mineTip.setText("雷剩余:" + 0);
 						mineView.replay();
 						timeTv.setText("耗时" + recLen + "秒");
@@ -245,6 +264,8 @@ public class MainActivity extends Activity implements CallBack {
 	boolean isTest = true;
 	private TextView bestScoreTv;
 	private Drawable drawable;
+	private TextView selcMineTv;
+	private TextView pauseTv;
 
 	@Override
 	public void fail() {
@@ -255,7 +276,7 @@ public class MainActivity extends Activity implements CallBack {
 		recLen = 0;
 		title.setGravity(Gravity.CENTER);
 		final AlertDialog alert = new AlertDialog.Builder(this,
-				AlertDialog.THEME_DEVICE_DEFAULT_DARK).setView(view)
+				AlertDialog.THEME_DEVICE_DEFAULT_DARK).setCustomTitle(view)
 				.setNegativeButton("退出", new OnClickListener() {
 
 					@Override
@@ -330,5 +351,117 @@ public class MainActivity extends Activity implements CallBack {
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.pause:
+			isPauseing = true;
+			view = View.inflate(this, R.layout.title, null);
+			TextView title = (TextView) view.findViewById(R.id.who);
+			title.setText("暂停游戏");
+			mHandler.removeMessages(0);
+			title.setGravity(Gravity.CENTER);
+			final AlertDialog alert = new AlertDialog.Builder(this,
+					AlertDialog.THEME_DEVICE_DEFAULT_DARK).setCustomTitle(view)
+					.setNegativeButton("暂停中...", new OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							isPauseing = false;
+							mHandler.sendEmptyMessageDelayed(0, 1000);
+						}
+					}).setCancelable(false).create();
+			// 透明
+			Window window = alert.getWindow();
+			WindowManager.LayoutParams lp = window.getAttributes();
+			lp.alpha = 0.6f;
+			window.setAttributes(lp);
+			alert.show();
+			break;
+		case R.id.selcmine:
+			final ChoiceLevel pop = new ChoiceLevel(this, 0);
+			pop.show();
+			pop.setCancelable(false);
+			isPauseing = true;
+			mHandler.removeMessages(0);
+			pop.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view,
+						int position, long id) {
+					pop.dismiss();
+					isPauseing = false;
+					recLen = 0;
+					timeTv.setText("耗时" + recLen + "秒");
+					mHandler.removeMessages(0);
+					mHandler.sendEmptyMessageDelayed(0, 1000);
+					if (position == parent.getCount() - 1) {
+						mineView.choiceLevel(0);
+					} else {
+						mineView.choiceLevel(position + 1);
+					}
+				}
+			});
+			break;
+		case R.id.fix:
+			final ChoiceLevel popp = new ChoiceLevel(this, 0);
+			popp.show();
+			popp.setCancelable(false);
+			isPauseing = true;
+			mHandler.removeMessages(0);
+			List<String> list = new ArrayList<String>();
+			// 40, 42, 45, 47, 50, 60
+			list.add("地图无需修正");
+
+			list.add("15*14矩阵");// 1
+			list.add("16*14矩阵");// 2
+			list.add("17*14矩阵");// 3
+			list.add("18*14矩阵");// 4
+			list.add("19*14矩阵");// 5
+
+			list.add("15*15矩阵");
+			list.add("16*15矩阵");
+			list.add("17*15矩阵");
+			list.add("18*15矩阵");
+			list.add("19*15矩阵");
+
+			list.add("15*16矩阵");
+			list.add("16*16矩阵");
+			list.add("17*16矩阵");
+			list.add("18*16矩阵");
+			list.add("19*16矩阵");
+
+			popp.addItems(list);
+			popp.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view,
+						int position, long id) {
+					popp.dismiss();
+					recLen = 0;
+					timeTv.setText("耗时" + recLen + "秒");
+					isPauseing = false;
+					int type = 0;
+					if (position > 0) {
+						if (position <= 5) {
+							type = 1;
+						} else if (position <= 10) {
+							type = 2;
+						} else if (position <= 15) {
+							type = 3;
+						}
+					}
+					mineView.fixMap(type, position);
+					mHandler.removeMessages(0);
+					mHandler.sendEmptyMessageDelayed(0, 1000);
+				}
+			});
+			break;
+		default:
+			break;
+		}
 	}
 }

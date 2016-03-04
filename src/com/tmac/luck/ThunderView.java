@@ -31,9 +31,9 @@ import com.tmac.R;
 public class ThunderView extends View {
 	private static int MATRIXLEN = 14;
 	/** 矩阵 */
-	public int[][] matrix = new int[MATRIXLEN][MATRIXLEN];
+	public int[][] matrix = new int[MATRIXLEN + 3][MATRIXLEN];
 
-	int[][] mines = new int[matrix.length][matrix.length];
+	int[][] mines = new int[matrix.length][matrix[0].length];
 	/** 画笔 */
 	private Paint mPaint;
 	private Paint numPaint;
@@ -52,10 +52,10 @@ public class ThunderView extends View {
 	/** 矩形的高度 */
 	private static float RECT_HEIGHT = 80;
 	private IPoint[][] numIPoints;
-	private int[][] seed = new int[matrix.length][matrix.length];
-	RectF[][] rects = new RectF[matrix.length][matrix.length];
+	private int[][] seed = new int[matrix.length][matrix[0].length];
+	RectF[][] rects = new RectF[matrix.length][matrix[0].length];
 	/** 触摸状态 */
-	private TouchStatus[][] touchStatus = new TouchStatus[matrix.length][matrix.length];
+	private TouchStatus[][] touchStatus = new TouchStatus[matrix.length][matrix[0].length];
 	int[] colors = new int[] { Color.parseColor("#414fbc"),// 1
 			Color.parseColor("#206803"),// 2
 			Color.parseColor("#af0204"),// 3
@@ -86,14 +86,19 @@ public class ThunderView extends View {
 	public static int TOTAL_NUM = 0;
 	public static int MINE_NUM = 0;
 	public static int RESULT_NUM = 0;
+	public static int THUNDER_COUNTER = 0;
+	public int level = 0;
+	/** 雷的数目 */
+	int[] level_thunder_num = { 0, 40, 42, 45, 47, 50, 60 };
 
 	public void loadData() {
 		TOTAL_NUM = 0;
 		MINE_NUM = 0;
+		THUNDER_COUNTER = 0;
 		new Thread() {
 			public void run() {
 				for (int i = 0; i < matrix.length; i++) {
-					for (int j = 0; j < matrix.length; j++) {
+					for (int j = 0; j < matrix[i].length; j++) {
 						int rd = Math.random() > 0.5 ? 0 : 1;
 						// rd = new Random().nextInt(5);
 						mines[i][j] = rd;
@@ -102,7 +107,7 @@ public class ThunderView extends View {
 				}
 				// 将地雷标记为9
 				for (int i = 0; i < matrix.length; i++) {
-					for (int j = 0; j < matrix.length; j++) {
+					for (int j = 0; j < matrix[i].length; j++) {
 						if (mines[i][j] == 1) {
 							int rd = Math.random() > 0.5 ? 0 : 1;
 							mines[i][j] = rd;
@@ -110,7 +115,7 @@ public class ThunderView extends View {
 					}
 				}
 				for (int i = 0; i < matrix.length; i++) {
-					for (int j = 0; j < matrix.length; j++) {
+					for (int j = 0; j < matrix[i].length; j++) {
 						if (mines[i][j] == 1) {
 							int rd = Math.random() > 0.5 ? 0 : 1;
 							mines[i][j] = rd;
@@ -119,13 +124,16 @@ public class ThunderView extends View {
 				}
 				// 将地雷标记为9
 				for (int i = 0; i < matrix.length; i++) {
-					for (int j = 0; j < matrix.length; j++) {
+					for (int j = 0; j < matrix[i].length; j++) {
 						if (mines[i][j] == 1) {
 							mines[i][j] = 9;
+							THUNDER_COUNTER += 1;
 							MINE_NUM += 1;
 						}
 					}
 				}
+				levelDispose(MINE_NUM, level_thunder_num[level]);
+
 				System.out.println("===================");
 				for (int i = 0; i < mines.length; i++) {
 					for (int j = 0; j < mines[i].length; j++) {
@@ -138,7 +146,7 @@ public class ThunderView extends View {
 				System.out.println("===================");
 				// 初始化seed,全部赋值0
 				for (int i = 0; i < matrix.length; i++) {
-					for (int j = 0; j < matrix.length; j++) {
+					for (int j = 0; j < matrix[i].length; j++) {
 						seed[i][j] = 0;
 					}
 				}
@@ -153,6 +161,40 @@ public class ThunderView extends View {
 				mHandler.sendEmptyMessage(0);
 			}
 		}.start();
+	}
+
+	/**
+	 * 难度,雷的处理
+	 */
+	public void levelDispose(int num, int maxThunderNum) {
+		if (num == 0 || maxThunderNum == 0) {
+			return;
+		}
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				if (mines[i][j] == 9) {
+					continue;
+				}
+				int rd = Math.random() > 0.5 ? 0 : 1;
+				mines[i][j] = rd;
+			}
+		}
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				if (THUNDER_COUNTER == maxThunderNum) {
+					break;
+				}
+				if (mines[i][j] == 1) {
+					mines[i][j] = 9;
+					THUNDER_COUNTER += 1;
+					MINE_NUM += 1;
+				}
+			}
+		}
+		// 25 +20 =45 < 60
+		if (THUNDER_COUNTER <= maxThunderNum) {
+			levelDispose(maxThunderNum - THUNDER_COUNTER, maxThunderNum);
+		}
 	}
 
 	public void init(Context context) {
@@ -174,7 +216,7 @@ public class ThunderView extends View {
 		numPaint.setColor(Color.GREEN);
 		numPaint.setTextSize(TypedValue.applyDimension(
 				TypedValue.COMPLEX_UNIT_DIP, 10, displayMetrics));
-		numIPoints = new IPoint[matrix.length][matrix.length];
+		numIPoints = new IPoint[matrix.length][matrix[0].length];
 
 		System.out.println();
 		System.out.println("========================================");
@@ -233,19 +275,19 @@ public class ThunderView extends View {
 			}
 			if (matrix.length * RECT_HEIGHT >= height - 50) {
 				RECT_HEIGHT = (height - 50) / matrix.length;
-				Log.e("DEBUG", "--" + RECT_HEIGHT);
+				Log.e("TEST", "--" + RECT_HEIGHT);
 			}
-			if (matrix.length * RECT_WIDTH >= width - 50) {
-				RECT_WIDTH = (width - 50) / matrix.length;
+			if (matrix[0].length * RECT_WIDTH >= width - 50) {
+				RECT_WIDTH = (width - 50) / matrix[0].length;
 			}
-			if (RECT_HEIGHT > RECT_WIDTH) {
+			if (RECT_HEIGHT < RECT_WIDTH) {
 				RECT_HEIGHT = RECT_WIDTH;
 			}
 			numPaint.setTextSize(TypedValue.applyDimension(
 					TypedValue.COMPLEX_UNIT_DIP, 12, displayMetrics));
 			loadData();
 			isInit = true;
-			startX = (width - matrix.length * RECT_WIDTH) / 2;
+			startX = (width - matrix[0].length * RECT_WIDTH) / 2;
 			startY = (height - matrix.length * RECT_HEIGHT) / 2;
 			for (int i = 0; i < matrix.length; i++) {
 				for (int j = 0; j < matrix[i].length; j++) {
@@ -361,6 +403,8 @@ public class ThunderView extends View {
 		}
 	}
 
+	public boolean isWin = false;
+
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
@@ -371,6 +415,9 @@ public class ThunderView extends View {
 		switch (event.getAction()) {
 
 		case MotionEvent.ACTION_UP:
+			if (isWin) {
+				return true;
+			}
 			if (isperformLongTask) {
 				mHandler.removeMessages(101);
 				mHandler.sendEmptyMessageDelayed(101, 488);
@@ -402,7 +449,7 @@ public class ThunderView extends View {
 										numIPoints[i][j].isShowing = false;
 									}
 									for (int x = 0; x < matrix.length; x++) {
-										for (int y = 0; y < matrix.length; y++) {
+										for (int y = 0; y < matrix[x].length; y++) {
 											if (mines[x][y] == 9) {
 												if (numIPoints[x][y].isShowing) {
 													numIPoints[x][y].isShowing = false;
@@ -430,6 +477,7 @@ public class ThunderView extends View {
 							if (TOTAL_NUM != 0) {
 								if (RESULT_NUM == TOTAL_NUM - MINE_NUM) {
 									if (call != null) {
+										isWin = true;
 										call.win(10);
 									}
 								}
@@ -483,31 +531,31 @@ public class ThunderView extends View {
 	private void coreLogical(int[][] a, int[][] b, int i, int j, boolean boom) {
 		if (i == 0 && j == 0) {
 			leftTop(a, b); // OK
-		} else if (i == 0 && j == a.length - 1) {
+		} else if (i == 0 && j == a[0].length - 1) {
 			rightTop(a, b);// ok
 		} else if (j == 0 && i == a.length - 1) {
 			leftBottom(a, b);// 0k
-		} else if (i == a.length - 1 && j == a.length - 1) {
+		} else if (i == a.length - 1 && j == a[0].length - 1) {
 			rightBottom(a, b);// 0k
-		} else if (i == 0 && j > 0 && j <= a.length - 2) {
+		} else if (i == 0 && j > 0 && j <= a[0].length - 2) {
 			topSide(a, b, j); // OK
-		} else if (i == a.length - 1 && j > 0 && j <= a.length - 2) {
+		} else if (i == a.length - 1 && j > 0 && j <= a[0].length - 2) {
 			bottomSide(a, b, j);// OK
 		} else if (j == 0 && i > 0 && i <= a.length - 2) {
 			leftVertical(a, b, i);// OK
-		} else if (j == a.length - 1 && i > 0 && i <= a.length - 2) {
+		} else if (j == a[0].length - 1 && i > 0 && i <= a.length - 2) {
 			Log.e("JULY", "RIGHTVERTICAL==");
 			rightVertical(a, b, i); // OK
-		} else if (i > 0 && i < a.length - 1 && j > 0 && j < a.length - 1) {
+		} else if (i > 0 && i < a.length - 1 && j > 0 && j < a[0].length - 1) {
 			calcuNine(a, b, i, j);
 		}
 	}
 
 	private void rightVertical(int[][] a, int[][] b, int i) {
 		for (int x = i - 1; x <= i + 1; x++) {
-			for (int y = a.length - 1; y >= a.length - 2; y--) {
+			for (int y = a[0].length - 1; y >= a[0].length - 2; y--) {
 				if (a[x][y] == 9) {
-					b[i][a.length - 1]++;
+					b[i][a[0].length - 1]++;
 				}
 			}
 		}
@@ -556,9 +604,9 @@ public class ThunderView extends View {
 
 	private void rightBottom(int[][] a, int[][] b) {
 		for (int x = a.length - 1; x >= a.length - 2; x--) {
-			for (int y = a.length - 1; y >= a.length - 2; y--) {
+			for (int y = a[0].length - 1; y >= a[0].length - 2; y--) {
 				if (a[x][y] == 9) {
-					b[a.length - 1][a.length - 1]++;
+					b[a.length - 1][a[0].length - 1]++;
 				}
 			}
 		}
@@ -576,9 +624,9 @@ public class ThunderView extends View {
 
 	private void rightTop(int[][] a, int[][] b) {
 		for (int x = 0; x < 2; x++) {
-			for (int y = a.length - 1; y >= a.length - 2; y--) {
+			for (int y = a[0].length - 1; y >= a[0].length - 2; y--) {
 				if (a[x][y] == 9) {
-					b[0][a.length - 1]++;
+					b[0][a[0].length - 1]++;
 				}
 			}
 		}
@@ -609,8 +657,24 @@ public class ThunderView extends View {
 		loadData();
 	}
 
+	/**
+	 * 重玩
+	 */
+	public void choiceLevel(int level) {
+		this.level = level;
+		RESULT_NUM = 0;
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				touchStatus[i][j] = TouchStatus.NORMAL;
+				counter = 0;
+				numIPoints[i][j].isShowing = false;
+			}
+		}
+		loadData();
+	}
+
 	public void openLogical(int x, int y) {
-		if (x < 0 || y < 0 || x > mines.length - 1 || y > mines.length - 1) {
+		if (x < 0 || y < 0 || x > mines.length - 1 || y > mines[0].length - 1) {
 			return;
 		}
 		if (touchStatus[x][y] == TouchStatus.TOUCHED) {
@@ -732,5 +796,72 @@ public class ThunderView extends View {
 			break;
 		}
 		return super.dispatchTouchEvent(event);
+	}
+
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		// setMeasuredDimension(measure(widthMeasureSpec, true),
+		// measure(widthMeasureSpec, false));
+	}
+
+	public int measure(int measureSpec, boolean isWidth) {
+		int result;
+		int size = MeasureSpec.getSize(measureSpec);
+		int mode = MeasureSpec.getMode(measureSpec);
+		int padding = isWidth ? getPaddingLeft() + getPaddingRight()
+				: getPaddingBottom() + getPaddingTop();
+		if (mode == MeasureSpec.EXACTLY) { // 精确模式
+			result = size;
+		} else {
+			result = isWidth ? getSuggestedMinimumWidth()
+					: getSuggestedMinimumHeight();
+			result += padding;
+			if (mode == MeasureSpec.AT_MOST) { // 最大模式
+				if (isWidth) {
+					result = Math.max(result, size);
+				} else {
+					result = Math.min(result, size);
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * 修正地图
+	 */
+	public void fixMap(int type, int level) {
+		if (type == 0) {
+			return;
+		}
+		// 1 2 3 4 5
+		// 6 7 8 9 10 11 12 13 14 15
+		//
+		if (level > 10) {
+			level = level - 10;
+		} else if (level > 5) {
+			level = level - 5;
+		}
+		matrix = new int[MATRIXLEN + level % 6][MATRIXLEN + (type - 1)];
+		Log.e("JULY_", "matrix.="+matrix.length);
+		Log.e("JULY_", "matrix[0].="+matrix[0].length);
+		mines = new int[matrix.length][matrix[0].length];
+		seed = new int[matrix.length][matrix[0].length];
+		rects = new RectF[matrix.length][matrix[0].length];
+		touchStatus = new TouchStatus[matrix.length][matrix[0].length];
+		numIPoints = new IPoint[matrix.length][matrix[0].length];
+		RESULT_NUM = 0;
+		isInit = false;
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				touchStatus[i][j] = TouchStatus.NORMAL;
+				counter = 0;
+				if (numIPoints[i][j] != null) {
+					numIPoints[i][j].isShowing = false;
+				}
+			}
+		}
+		loadData();
 	}
 }

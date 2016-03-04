@@ -31,7 +31,9 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.SparseArray;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -45,7 +47,21 @@ import android.widget.Toast;
  * ======================================================<br/>
  */
 public class Tools {
-
+	/** 获取控件 */
+	@SuppressWarnings("unchecked")
+	public static <T extends View> T getWidget(View view, int id) {
+		SparseArray<View> hashMap = (SparseArray<View>) view.getTag();
+		if (hashMap == null) {
+			hashMap = new SparseArray<View>();
+			view.setTag(hashMap);
+		}
+		View childView = hashMap.get(id);
+		if (childView == null) {
+			childView = view.findViewById(id);
+			hashMap.put(id, childView);
+		}
+		return (T) childView;
+	}
 	/**
 	 * @description :获取版本�?
 	 */
