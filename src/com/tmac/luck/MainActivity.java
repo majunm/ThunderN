@@ -441,18 +441,19 @@ public class MainActivity extends Activity implements CallBack,
 				public void onItemClick(AdapterView<?> parent, View view,
 						int position, long id) {
 					popp.dismiss();
+					if (position == 0) { // 修正bug
+						return;
+					}
 					recLen = 0;
 					timeTv.setText("耗时" + recLen + "秒");
 					isPauseing = false;
 					int type = 0;
-					if (position > 0) {
-						if (position <= 5) {
-							type = 1;
-						} else if (position <= 10) {
-							type = 2;
-						} else if (position <= 15) {
-							type = 3;
-						}
+					if (position <= 5) {
+						type = 1;
+					} else if (position <= 10) {
+						type = 2;
+					} else if (position <= 15) {
+						type = 3;
 					}
 					mineView.fixMap(type, position);
 					mHandler.removeMessages(0);
