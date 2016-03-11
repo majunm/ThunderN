@@ -181,6 +181,22 @@ public class ThunderView extends View {
 		}
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++) {
+				if (mines[i][j] == 1) {
+					int rd = Math.random() > 0.5 ? 0 : 1;
+					mines[i][j] = rd;
+				}
+			}
+		}
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				if (mines[i][j] == 1) {
+					int rd = Math.random() > 0.5 ? 0 : 1;
+					mines[i][j] = rd;
+				}
+			}
+		}
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
 				if (THUNDER_COUNTER == maxThunderNum) {
 					break;
 				}
